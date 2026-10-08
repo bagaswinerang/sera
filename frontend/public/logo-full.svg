@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400">
+  <defs>
+    <linearGradient id="l3-bg-full" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0E0F14" />
+      <stop offset="100%" stop-color="#070709" />
+    </linearGradient>
+    <linearGradient id="l3-grad-full" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFA600" />
+      <stop offset="50%" stop-color="#FF5100" />
+      <stop offset="100%" stop-color="#E11D48" />
+    </linearGradient>
+    <linearGradient id="l3-text-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#F1F5F9" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="400" rx="32" fill="url(#l3-bg-full)" />
+  <rect width="1196" height="396" x="2" y="2" rx="30" fill="none" stroke="rgba(255, 120, 0, 0.12)" stroke-width="2" />
+
+  <!-- Logo Mark -->
+  <g transform="translate(60, 35) scale(0.64)">
+    <path d="M 346 172
+             C 346 128, 308 96, 256 96
+             C 198 96, 154 140, 154 198
+             C 154 266, 224 286, 276 304
+             C 324 320, 358 344, 358 392
+             C 358 450, 310 490, 256 490
+             C 196 490, 154 452, 154 402"
+          fill="none"
+          stroke="url(#l3-grad-full)"
+          stroke-width="52"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          transform="translate(0, -38) scale(1, 0.94) translate(0, 16)" />
+    <circle cx="346" cy="142" r="14" fill="#FFA600" />
+    <circle cx="154" cy="370" r="12" fill="#E11D48" />
+  </g>
+
+  <!-- Typography -->
+  <text x="440" y="215" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="140" fill="url(#l3-text-grad)" letter-spacing="4">SERA</text>
+  <circle cx="895" cy="130" r="14" fill="#E11D48" />
+  
+  <text x="444" y="275" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="28" fill="#FF7700" letter-spacing="8">AI SAHAM INDONESIA</text>
+  <rect x="444" y="298" width="580" height="2" fill="url(#l3-grad-full)" opacity="0.6" />
+  <text x="444" y="332" font-family="system-ui, -apple-system, sans-serif" font-weight="500" font-size="20" fill="#94A3B8" letter-spacing="3">MONOLINE CONTINUUM • COMPOUNDING ALPHA</text>
+</svg>

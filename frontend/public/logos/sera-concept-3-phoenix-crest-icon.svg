@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="l3-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#111116" />
+      <stop offset="100%" stop-color="#08080B" />
+    </linearGradient>
+    <linearGradient id="l3-loop-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFA600" />
+      <stop offset="48%" stop-color="#FF5100" />
+      <stop offset="100%" stop-color="#E11D48" />
+    </linearGradient>
+    <linearGradient id="l3-border-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255, 166, 0, 0.22)" />
+      <stop offset="100%" stop-color="rgba(225, 29, 72, 0.15)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Clean Matte Background -->
+  <rect width="512" height="512" rx="112" fill="url(#l3-bg)" />
+  <rect width="508" height="508" x="2" y="2" rx="110" fill="none" stroke="url(#l3-border-grad)" stroke-width="2" />
+
+  <!-- ULTRA-MINIMALIST MONOLINE S (CONTINUUM DUAL ARC) -->
+  <path d="M 346 172
+           C 346 128, 308 96, 256 96
+           C 198 96, 154 140, 154 198
+           C 154 266, 224 286, 276 304
+           C 324 320, 358 344, 358 392
+           C 358 450, 310 490, 256 490
+           C 196 490, 154 452, 154 402"
+        fill="none"
+        stroke="url(#l3-loop-grad)"
+        stroke-width="52"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        transform="translate(0, -38) scale(1, 0.94) translate(0, 16)" />
+
+  <circle cx="346" cy="142" r="14" fill="#FFA600" />
+  <circle cx="154" cy="370" r="12" fill="#E11D48" />
+</svg>

@@ -1,0 +1,58 @@
+[
+  {
+    "slug": "per",
+    "term": "PER (Price to Earnings Ratio)",
+    "aliases": ["per", "price earning ratio", "price to earnings", "rasio harga laba", "pe ratio", "pe"],
+    "simple": "Berapa tahun laba perusahaan untuk menyamai harga sahamnya.",
+    "detail": "Harga saham dibagi laba bersih per saham. PER kecil tidak otomatis murah: bisa juga karena labanya sedang turun. Bandingkan dengan perusahaan sejenis, bukan lintas industri.",
+    "example": "PER 18x artinya harga saham setara 18 tahun laba saat ini."
+  },
+  {
+    "slug": "forward-per",
+    "term": "Forward PER (PER ke depan)",
+    "aliases": ["forward pe", "forward per", "per ke depan", "pe ke depan"],
+    "simple": "PER yang dihitung memakai perkiraan laba tahun depan, bukan laba yang sudah lewat.",
+    "detail": "Bergantung pada perkiraan analis, jadi bisa meleset. Kadang datanya tidak tersedia untuk perusahaan tertentu.",
+    "example": "Forward PER 12x artinya harga saham setara 12 tahun dari perkiraan laba tahun depan."
+  },
+  {
+    "slug": "pbv",
+    "term": "PBV (Price to Book Value)",
+    "aliases": ["pbv", "pb", "price to book", "price to book value", "harga terhadap nilai buku"],
+    "simple": "Perbandingan harga saham dengan nilai bersih aset perusahaan di pembukuan.",
+    "detail": "Nilai buku = aset dikurangi utang, dibagi jumlah saham. PBV di bawah 1 berarti harga saham di bawah nilai bukunya, tapi perlu dilihat apakah asetnya memang berkualitas. Sering dipakai untuk membandingkan bank.",
+    "example": "PBV 2x artinya harga saham dua kali nilai buku per sahamnya."
+  },
+  {
+    "slug": "roe",
+    "term": "ROE (Return on Equity)",
+    "aliases": ["roe", "return on equity", "imbal hasil ekuitas"],
+    "simple": "Dari modal milik pemegang saham, berapa persen yang berhasil diubah jadi laba dalam setahun.",
+    "detail": "Laba bersih dibagi ekuitas. ROE tinggi menandakan perusahaan efisien memutar modal, tapi ROE yang tinggi karena utang besar punya risiko lebih tinggi.",
+    "example": "ROE 20% artinya tiap Rp100 modal pemegang saham menghasilkan laba Rp20 dalam setahun."
+  },
+  {
+    "slug": "dividend-yield",
+    "term": "Dividend Yield (Imbal Hasil Dividen)",
+    "aliases": ["dividend yield", "yield dividen", "dividen yield", "dividen", "dividend"],
+    "simple": "Dividen yang dibagikan dalam setahun dibanding harga saham.",
+    "detail": "Dividen adalah bagian laba yang dibagikan ke pemegang saham. Yield berubah mengikuti harga saham, dan dividen masa lalu tidak menjamin dividen masa depan.",
+    "example": "Yield 5% artinya dividen setahun setara 5% dari harga saham."
+  },
+  {
+    "slug": "kapitalisasi-pasar",
+    "term": "Kapitalisasi Pasar (Market Cap)",
+    "aliases": ["market cap", "kapitalisasi pasar", "kapitalisasi", "mcap"],
+    "simple": "Harga saham dikali jumlah saham beredar: ukuran seberapa besar perusahaan di bursa.",
+    "detail": "Ini nilai pasar perusahaan, bukan jumlah uang yang dimilikinya. Dipakai untuk mengelompokkan perusahaan besar, menengah, dan kecil.",
+    "example": "Harga Rp1.000 dengan 1 miliar saham beredar berarti kapitalisasi pasar Rp1 triliun."
+  },
+  {
+    "slug": "laporan-keuangan-kuartalan",
+    "term": "Laporan Keuangan Kuartalan",
+    "aliases": ["laporan kuartalan", "laporan keuangan", "kuartalan", "kuartal", "quarterly", "laporan keuangan kuartalan"],
+    "simple": "Rapor perusahaan setiap 3 bulan: berapa uang masuk, berapa laba, dan kondisi aset serta utangnya.",
+    "detail": "Tiga hal paling mudah dibaca: pendapatan (uang masuk), laba bersih (sisa setelah semua biaya), dan arus kas. Bandingkan dengan kuartal sebelumnya dan kuartal yang sama tahun lalu, karena sebagian bisnis punya pola musiman.",
+    "example": "Laba kuartal ini naik dibanding kuartal lalu berarti bisnisnya lebih untung dalam 3 bulan terakhir."
+  }
+]
