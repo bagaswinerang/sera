@@ -13,6 +13,33 @@ export const metadata: Metadata = {
   title: "Sera — Tanya saham pakai bahasa sehari-hari",
   description:
     "Sera mengambil data pasar Indonesia lalu menjelaskannya dengan bahasa sehari-hari.",
+  icons: {
+    icon: "/logo-icon.svg",
+    shortcut: "/logo-icon.png",
+    apple: "/logo-icon.png",
+  },
+  openGraph: {
+    title: "Sera — Asisten AI Saham Indonesia",
+    description: "Tanya saham pakai bahasa sehari-hari tanpa jargon rumit.",
+    url: "https://sera-ai.vercel.app", // Akan di-override dinamis nanti atau biarkan
+    siteName: "Sera",
+    images: [
+      {
+        url: "/logo-full.png",
+        width: 1200,
+        height: 630,
+        alt: "Sera - Asisten AI Saham Indonesia",
+      },
+    ],
+    locale: "id_ID",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sera — Asisten AI Saham Indonesia",
+    description: "Tanya saham pakai bahasa sehari-hari tanpa jargon rumit.",
+    images: ["/logo-full.png"],
+  },
 };
 
 export const viewport: Viewport = {
