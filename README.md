@@ -23,7 +23,7 @@ Proyek ini dibangun menggunakan arsitektur *Monorepo*:
 **Backend:**
 - [Express.js](https://expressjs.com) - Node.js Server
 - [Vercel AI SDK](https://sdk.vercel.ai/docs) - Orchestrator integrasi LLM (Tool Calling & Streaming)
-- [Google Gemini Pro](https://deepmind.google/technologies/gemini/) - LLM Engine (Core Intelligence)
+- [Google Gemini 4 Hydrogen](https://deepmind.google/technologies/gemini/) - LLM Engine (Core Intelligence)
 - [Sectors API](https://sectors.app/api) - Penyedia data finansial BEI real-time
 
 ## 🚀 Panduan Menjalankan di Komputer Lokal

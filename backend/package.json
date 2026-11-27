@@ -14,9 +14,9 @@
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
-    "@ai-sdk/google": "^4.0.88",
+    "@ai-sdk/google": "^4.0.128",
     "@supabase/supabase-js": "^2.117.2",
-    "ai": "^7.0.128",
+    "ai": "^7.0.183",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "lru-cache": "^11.5.3",
