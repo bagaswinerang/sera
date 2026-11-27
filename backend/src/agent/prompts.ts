@@ -1,8 +1,12 @@
 import { DISCLAIMER } from "./guardrail";
 
+type GlossaryEntry = { term: string; simple: string; detail: string; example: string };
+
 export function buildSystemPrompt(opts: {
   level?: "simple" | "detail";
   companies?: string[];
+  /** entri kamus yang sudah dicari server untuk pertanyaan definisi */
+  glossary?: GlossaryEntry[];
 }) {
   const today = new Date().toISOString().slice(0, 10);
   const level =
@@ -11,6 +15,10 @@ export function buildSystemPrompt(opts: {
       : "Gaya: SEDERHANA & SINGKAT. Jelaskan dengan santai seperti ke pemula. Hindari jargon rumit, gunakan kalimat yang to-the-point dan ringkas agar mudah dicerna.";
   const ctx = opts.companies?.length
     ? `Konteks (jika disebut "yang tadi"): ${opts.companies.join(", ")}.`
+    : "";
+  const kamus = opts.glossary?.length
+    ? "KAMUS (sudah dicarikan untuk pertanyaan ini, JANGAN panggil lookup_glossary):\n" +
+      opts.glossary.map((g) => `- ${g.term}: ${g.simple} ${g.detail} Contoh: ${g.example}`).join("\n")
     : "";
 
   return `Kamu Sera, AI asisten saham BEI. Tgl: ${today}.
@@ -21,7 +29,7 @@ ATURAN:
    - Gunakan paragraf yang mengalir santai untuk penjelasan umum, konteks, analisis cerita, maupun kesimpulan.
    - Gunakan poin-poin (bullet points) HANYA jika memang dibutuhkan (misalnya saat merinci beberapa metrik terpisah, daftar saham, atau poin perbandingan tertentu).
    - Jangan jadikan seluruh jawaban serba poin-poin; variasikan struktur tulisan dengan paduan paragraf dan poin ringkas seperlunya.
-4. Jika ditanya definisi/istilah (misal: "apa itu PER"), pakai lookup_glossary dulu. Berikan jawaban yang SANGAT SINGKAT dan langsung ke intinya (maksimal 2 paragraf). Jangan membuat analisis panjang jika hanya ditanya definisi!
+4. Jika ditanya definisi/istilah (misal: "apa itu PER"), pakai KAMUS di bawah jika ada; jika tidak ada, pakai lookup_glossary dulu. Berikan jawaban yang SANGAT SINGKAT dan langsung ke intinya (maksimal 2 paragraf). Jangan membuat analisis panjang jika hanya ditanya definisi!
 5. Hemat API: jangan panggil berulang untuk data yang sama.
 6. Hasil compare_companies otomatis jadi tabel. Jangan ulang angkanya, beri kesimpulan 2-3 kalimat siapa unggul. Beda sektor tidak bisa diadu PER/PBV.
 7. Untuk sapaan/casual (hai, apa kabar, dll.) jawab dengan ramah dan singkat lalu arahkan kembali ke topik saham. Tolak topik yang benar-benar di luar saham BEI (politik, agama, coding, dll.) dengan sopan.
@@ -37,6 +45,7 @@ ATURAN:
 
 ${level}
 ${ctx}
+${kamus}
 
 PANDUAN screen_companies:
 - Utamakan where (murah). q (natural) mahal, pakai jika terpaksa.

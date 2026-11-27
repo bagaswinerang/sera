@@ -40,3 +40,21 @@ export function lookupGlossary(query: string) {
 function pick(e: Entry) {
   return { term: e.term, simple: e.simple, detail: e.detail, example: e.example };
 }
+
+// Kata yang menandai pertanyaan definisi ("apa itu PER?", "artinya PBV apa?", "what is ROE").
+const DEFINITION_CUE =
+  /\b(apa (itu|sih|ya)|apaan|arti(nya)?|pengertian|definisi|maksud(nya)?|yang dimaksud|istilah|what is|what's|meaning)\b/i;
+
+/**
+ * Untuk pertanyaan definisi: cari istilah kamus yang disebut di teks (cocok per kata utuh).
+ * Hasilnya disisipkan langsung ke prompt, jadi model tidak perlu memanggil lookup_glossary
+ * (hemat satu putaran ke LLM). Mengembalikan [] jika bukan pertanyaan definisi.
+ */
+export function findDefinitionEntries(text: string, max = 3) {
+  if (!DEFINITION_CUE.test(text)) return [];
+  const words = ` ${norm(text)} `;
+  return glossary
+    .filter((e) => [e.slug.replace(/-/g, " "), e.term, ...e.aliases].some((a) => words.includes(` ${norm(a)} `)))
+    .slice(0, max)
+    .map(pick);
+}
