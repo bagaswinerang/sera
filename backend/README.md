@@ -36,6 +36,7 @@ Error sebelum streaming berupa JSON `{"error":"..."}`: 400 (input salah), 429 (l
 | `GOOGLE_GENERATIVE_AI_API_KEY` | ya | dari Google AI Studio |
 | `GEMINI_MODELS` | tidak | model berurutan; default `gemini-4-hydrogen,gemini-3.8-flash,gemini-3.5-flash-lite` |
 | `MODEL_TIMEOUT_MS` | tidak | batas tunggu model mulai merespons sebelum pindah ke cadangan; default `10000` (10 detik) |
+| `FOLLOWUP_MODEL` | tidak | model ringan untuk saran pertanyaan lanjutan jika model utama lupa membuatnya; default `gemini-3.5-flash-lite` |
 | `PORT` | tidak | default 8787 |
 | `FRONTEND_ORIGIN` | tidak | origin yang diizinkan CORS, default `http://localhost:3000` (boleh banyak, pisah koma) |
 | `TRUST_PROXY` | tidak | isi `1` bila di belakang proxy hosting |

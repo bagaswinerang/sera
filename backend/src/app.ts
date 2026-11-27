@@ -13,7 +13,7 @@ export function createApp(opts: ChatDeps & {
   const app = express();
   if (opts.trustProxy) app.set("trust proxy", 1);
   app.use(cors({ origin: opts.frontendOrigin.split(",").map((s) => s.trim()) }));
-  app.use(createRoutes({ getModel: opts.getModel }));
+  app.use(createRoutes({ getModel: opts.getModel, getFollowUpModel: opts.getFollowUpModel }));
   app.use(notFound);
   app.use(errorHandler);
   return app;

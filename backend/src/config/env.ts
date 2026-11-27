@@ -20,6 +20,10 @@ export const env = {
       .map((s) => s.trim())
       .filter(Boolean);
   },
+  /** Model ringan untuk saran pertanyaan cadangan (jika model utama lupa memanggil suggest_follow_up). */
+  get followUpModel() {
+    return process.env.FOLLOWUP_MODEL?.trim() || "gemini-3.5-flash-lite";
+  },
   /** Batas waktu (ms) sebuah model mulai merespons sebelum pindah ke model cadangan. Default 10 detik. */
   get modelTimeoutMs() {
     const n = Number(process.env.MODEL_TIMEOUT_MS ?? 10_000);

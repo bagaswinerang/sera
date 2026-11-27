@@ -7,7 +7,8 @@ import {
   type LanguageModel,
   type UIMessage,
 } from "ai";
-import { runAgent } from "../agent/agent";
+import { runAgent, extractTextFromMessage } from "../agent/agent";
+import { generateFollowUps } from "../agent/followups";
 import { tools } from "../agent/tools";
 import { prepareHistory } from "../agent/history";
 
@@ -46,7 +47,11 @@ function classifyError(e: unknown): string {
   return "SERA_UNKNOWN";
 }
 
-export type ChatDeps = { getModel: () => LanguageModel | null };
+export type ChatDeps = {
+  getModel: () => LanguageModel | null;
+  /** model ringan untuk saran pertanyaan cadangan; kosong = pakai model utama */
+  getFollowUpModel?: () => LanguageModel | null;
+};
 
 // Isi pesan (UIMessage) divalidasi longgar; strukturnya dikelola AI SDK.
 const chatBodySchema = z.object({
@@ -100,14 +105,41 @@ export function chatController(deps: ChatDeps): RequestHandler {
         return;
       }
 
-      await pipeUIMessageStreamToResponse({
+      const onError = (e: unknown) => {
+        console.error("[stream error]", e);
+        return classifyError(e);
+      };
+      const history = prepareHistory(messages as unknown as UIMessage[]);
+      const lastUser = [...history].reverse().find((m) => m.role === "user");
+
+      pipeUIMessageStreamToResponse({
         response: res,
-        stream: toUIMessageStream({
-          stream: result.stream.stream,
-          tools,
-          onError: (e) => {
-            console.error("[stream error]", e);
-            return classifyError(e);
+        stream: createUIMessageStream({
+          onError,
+          execute: async ({ writer }) => {
+            // Teruskan jawaban model chunk demi chunk (berurutan, supaya chunk tambahan di bawah
+            // pasti terkirim sebelum "finish").
+            const ui = toUIMessageStream({ stream: result.stream.stream, tools, onError, sendFinish: false });
+            for await (const chunk of ui) writer.write(chunk);
+
+            // Model lupa memanggil suggest_follow_up -> buatkan saran cadangan.
+            const steps = await Promise.resolve(result.stream.steps).catch(() => null);
+            const answer = steps?.map((s) => s.text).join("").trim() ?? "";
+            const suggested = steps?.some((s) => s.toolCalls.some((c) => c.toolName === "suggest_follow_up"));
+            if (steps && answer && !suggested && !abort.signal.aborted) {
+              const questions = await generateFollowUps({
+                model: deps.getFollowUpModel?.() ?? model,
+                question: lastUser ? extractTextFromMessage(lastUser) : "",
+                answer,
+                abortSignal: abort.signal,
+              });
+              if (questions.length) {
+                const toolCallId = "follow-up-fallback";
+                writer.write({ type: "tool-input-available", toolCallId, toolName: "suggest_follow_up", input: { questions } });
+                writer.write({ type: "tool-output-available", toolCallId, output: { questions } });
+              }
+            }
+            writer.write({ type: "finish" });
           },
         }),
       });

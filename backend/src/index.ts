@@ -1,9 +1,13 @@
 import { createApp } from "./app";
 import { env } from "./config/env";
+import { google } from "@ai-sdk/google";
 import { getModel } from "./agent/model";
+
+const followUpModel = google(env.followUpModel);
 
 const app = createApp({
   getModel,
+  getFollowUpModel: () => followUpModel,
   frontendOrigin: env.frontendOrigin,
   trustProxy: env.trustProxy,
 });

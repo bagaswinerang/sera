@@ -26,8 +26,7 @@ const followUpAfterAnswer: StopCondition<typeof tools> = ({ steps }) =>
 
 export type AgentResult =
   | { type: "blocked"; reason: string; response: string }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  | { type: "ok"; stream: any };
+  | { type: "ok"; stream: ReturnType<typeof streamText<typeof tools>> };
 
 /** Inti agent: satu fungsi, model bisa diganti (Gemini di produksi, model tiruan di tes). */
 export async function runAgent(opts: {
@@ -97,7 +96,7 @@ export async function runAgent(opts: {
 }
 
 /** Ekstrak teks dari UIMessage, support berbagai format (string content / parts). */
-function extractTextFromMessage(msg: UIMessage): string {
+export function extractTextFromMessage(msg: UIMessage): string {
   // Coba dari parts dulu
   if (Array.isArray(msg.parts)) {
     return msg.parts
