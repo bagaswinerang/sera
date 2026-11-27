@@ -20,10 +20,10 @@ export const env = {
       .map((s) => s.trim())
       .filter(Boolean);
   },
-  /** Batas waktu (ms) sebuah model mulai merespons sebelum pindah ke model cadangan. Default 20 detik. */
+  /** Batas waktu (ms) sebuah model mulai merespons sebelum pindah ke model cadangan. Default 10 detik. */
   get modelTimeoutMs() {
-    const n = Number(process.env.MODEL_TIMEOUT_MS ?? 20_000);
-    return Number.isFinite(n) && n > 0 ? n : 20_000;
+    const n = Number(process.env.MODEL_TIMEOUT_MS ?? 10_000);
+    return Number.isFinite(n) && n > 0 ? n : 10_000;
   },
   get supabaseUrl() {
     return process.env.SUPABASE_URL;
