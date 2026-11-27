@@ -18,12 +18,18 @@ function shouldFallback(e: unknown): boolean {
 // Model yang baru gagal dilewati sementara, supaya tiap request tidak membuang waktu ke model yang sedang mati.
 const cooldownMs = (e: unknown) => (APICallError.isInstance(e) && e.statusCode === 404 ? 10 * 60_000 : 60_000);
 
+function describe(e: unknown, isTimeout: boolean, timeoutMs: number): string {
+  if (isTimeout) return `timeout ${timeoutMs / 1000} detik`;
+  if (APICallError.isInstance(e)) return `HTTP ${e.statusCode ?? "?"}`;
+  return e instanceof Error ? e.message.slice(0, 120) : String(e);
+}
+
 /** Mencoba model satu per satu sampai ada yang berhasil. Fallback hanya bisa terjadi SEBELUM jawaban mulai mengalir. */
-export function createFallbackModel(models: ModelV4[]): ModelV4 {
+export function createFallbackModel(models: ModelV4[], timeoutMs = env.modelTimeoutMs): ModelV4 {
   const skipUntil = new Map<string, number>();
 
   async function run<T>(
-    call: (m: ModelV4, attemptSignal?: AbortSignal) => PromiseLike<T>,
+    call: (m: ModelV4, attemptSignal: AbortSignal) => PromiseLike<T>,
     userSignal?: AbortSignal
   ): Promise<T> {
     const now = Date.now();
@@ -31,45 +37,37 @@ export function createFallbackModel(models: ModelV4[]): ModelV4 {
     const order = ready.length ? ready : models; // semua sedang cooldown -> coba semuanya lagi
     let lastError: unknown;
 
-    for (const m of order) {
+    for (const [i, m] of order.entries()) {
       let isTimeout = false;
       const attemptCtrl = new AbortController();
-
-      // Timeout: jika 12 detik model belum merespons, coba model berikutnya.
-      // Free tier Gemini sering butuh 5-10 detik untuk mulai stream.
-      const timeoutTimer = setTimeout(() => {
+      // Jika model belum mulai merespons dalam timeoutMs, batalkan dan coba model berikutnya.
+      const timer = setTimeout(() => {
         isTimeout = true;
-        attemptCtrl.abort(new Error("TimeoutLimit"));
-      }, 12_000);
-
+        attemptCtrl.abort(new Error(`Model ${m.modelId} timeout`));
+      }, timeoutMs);
       const onUserAbort = () => attemptCtrl.abort(userSignal?.reason);
       userSignal?.addEventListener("abort", onUserAbort);
 
       try {
         const out = await call(m, attemptCtrl.signal);
-        clearTimeout(timeoutTimer);
-        userSignal?.removeEventListener("abort", onUserAbort);
-
         if (m !== models[0]) console.warn(`[model] memakai cadangan: ${m.modelId}`);
         return out;
       } catch (e) {
-        clearTimeout(timeoutTimer);
-        userSignal?.removeEventListener("abort", onUserAbort);
-
-        // Jika user yang menutup tab/batalin, jangan fallback, langsung lemparkan error-nya
+        // User menutup tab / membatalkan: jangan fallback.
         if (userSignal?.aborted) throw e;
+        // Error request/API key (400/401/403): model lain pun akan gagal.
+        if (!isTimeout && !shouldFallback(e)) throw e;
 
-        // Jika timeout atau memang error teknis (429, 503, dll), lakukan fallback
-        if (isTimeout || shouldFallback(e)) {
-          skipUntil.set(m.modelId, Date.now() + cooldownMs(e));
-          console.warn(
-            `[model] ${m.modelId} gagal (${isTimeout ? "Timeout 3 detik" : "Error"}), coba model berikutnya`
-          );
-          lastError = e;
-        } else {
-          // Error yang tidak wajar (misal salah API Key), batalkan semua
-          throw e;
-        }
+        skipUntil.set(m.modelId, Date.now() + cooldownMs(e));
+        const next = order[i + 1];
+        console.warn(
+          `[model] ${m.modelId} gagal (${describe(e, isTimeout, timeoutMs)})` +
+            (next ? `, coba ${next.modelId}` : ", tidak ada cadangan lagi")
+        );
+        lastError = e;
+      } finally {
+        clearTimeout(timer);
+        userSignal?.removeEventListener("abort", onUserAbort);
       }
     }
     throw lastError;

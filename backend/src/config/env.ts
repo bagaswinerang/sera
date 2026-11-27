@@ -14,11 +14,16 @@ export const env = {
     const raw =
       process.env.GEMINI_MODELS ??
       process.env.GEMINI_MODEL ??
-      "gemini-4-hydrogen,gemini-3.8-flash,gemini-3.6-flash,gemini-3.5-flash-lite";
+      "gemini-4-hydrogen,gemini-3.8-flash";
     return raw
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean);
+  },
+  /** Batas waktu (ms) sebuah model mulai merespons sebelum pindah ke model cadangan. Default 20 detik. */
+  get modelTimeoutMs() {
+    const n = Number(process.env.MODEL_TIMEOUT_MS ?? 20_000);
+    return Number.isFinite(n) && n > 0 ? n : 20_000;
   },
   get supabaseUrl() {
     return process.env.SUPABASE_URL;
