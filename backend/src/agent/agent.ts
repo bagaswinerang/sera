@@ -79,7 +79,6 @@ export async function runAgent(opts: {
     activeTools: glossary.length ? ALL_TOOLS.filter((t) => t !== "lookup_glossary") : ALL_TOOLS,
     abortSignal: opts.abortSignal,
     maxOutputTokens: opts.level === "detail" ? 2048 : 1024, // Beda limit sesuai mode
-    temperature: 0, // Jawaban lebih konsisten
     // Fallback antar-model sudah jadi mekanisme coba-ulang utama; retry di sini mengulang
     // SELURUH rantai model, jadi dibatasi 1 supaya user tidak menunggu terlalu lama saat Google overload.
     maxRetries: 1,
