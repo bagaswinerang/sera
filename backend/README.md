@@ -26,7 +26,7 @@ Body `POST /api/chat`:
 ```
 `level` opsional: `"simple"` (default) atau `"detail"`. Untuk percakapan lanjutan, kirim RIWAYAT LENGKAP (termasuk part tool dari jawaban sebelumnya).
 
-Error sebelum streaming berupa JSON `{"error":"..."}`: 400 (input salah), 429 (lebih dari 20 permintaan per 10 menit per IP), 500 (server/konfigurasi).
+Error sebelum streaming berupa JSON `{"error":"..."}`: 400 (input salah), 429 (lebih dari 100 permintaan per 10 menit per IP), 500 (server/konfigurasi).
 
 
 ## Konfigurasi `.env`

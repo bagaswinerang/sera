@@ -13,8 +13,11 @@ const INJECTION_PATTERNS: { pattern: RegExp; label: string }[] = [
   { pattern: /\b(you.{0,6}(must|harus).{0,15}(obey|ikuti|patuhi))\b/i, label: "role-override" },
 
   // ── Instruction Override ──
-  { pattern: /\b(ignore|abaikan|lupakan|forget).{0,20}(previous|sebelumnya|above|atas|all|semua|system|instruction|aturan|perintah|rule)/i, label: "instruction-override" },
-  { pattern: /\b(override|timpa|ganti).{0,15}(instruction|system|prompt|aturan|perintah)/i, label: "instruction-override" },
+  // Harus menyebut instruksi/aturan: "lupakan semua yang tadi, bahas ASII" atau
+  // "abaikan saham kecil" adalah percakapan normal, bukan injection.
+  { pattern: /\b(ignore|disregard|abaikan|lupakan|forget)\b.{0,30}\b(instructions?|(instruksi|aturan|perintah)(mu|nya)?|rules?|prompt|system|sistem)\b/i, label: "instruction-override" },
+  { pattern: /\b(ignore|disregard|forget)\b.{0,10}\b(previous|above|everything)\b/i, label: "instruction-override" },
+  { pattern: /\b(override|timpa)\b.{0,15}\b(instructions?|instruksi|system|prompt|aturan|perintah)\b/i, label: "instruction-override" },
   { pattern: /\b(do not follow|jangan ikuti|langgar).{0,15}(rule|aturan|instruction|perintah)/i, label: "instruction-override" },
 
   // ── System Prompt Extraction ──
@@ -23,13 +26,16 @@ const INJECTION_PATTERNS: { pattern: RegExp; label: string }[] = [
   { pattern: /\b(apa.{0,10}(instruksi|aturan|prompt|perintah).{0,10}(sistem|awal|kamu))/i, label: "prompt-extraction" },
 
   // ── Jailbreak Delimiters ──
-  { pattern: /\[?(system|SYSTEM)\]?\s*[:>]/i, label: "fake-system-tag" },
+  // Hanya di awal baris ("system: ..."), bukan "trading system: ..." di tengah kalimat.
+  { pattern: /(^|\n)\s*\[?system\]?\s*[:>]/i, label: "fake-system-tag" },
   { pattern: /```\s*(system|admin|root|SYSTEM)\b/i, label: "fake-system-block" },
   { pattern: /<\/?system>/i, label: "fake-system-xml" },
   { pattern: /---\s*(new|override|system)\s*---/i, label: "delimiter-injection" },
 
   // ── DAN / Jailbreak Techniques ──
-  { pattern: /\bD\.?A\.?N\.?\b/i, label: "dan-jailbreak" },
+  // JANGAN pakai flag /i untuk "DAN": "dan" adalah kata sambung ("BBCA dan BBRI").
+  { pattern: /\bdo anything now\b/i, label: "dan-jailbreak" },
+  { pattern: /\bD\.?A\.?N\b.{0,10}\b(mode|prompt|jailbreak)\b|\b(you are|kamu)( now| sekarang)?( adalah)? D\.?A\.?N\b/, label: "dan-jailbreak" },
   { pattern: /\b(developer|admin|sudo|root).{0,10}(mode|access|akses|override)\b/i, label: "privilege-escalation" },
   { pattern: /\b(unlock|buka).{0,10}(restriction|batasan|filter|limit)\b/i, label: "restriction-bypass" },
 
@@ -75,7 +81,10 @@ export function detectInjection(text: string): InjectionResult {
 
 // ─────────────────────────────────────────────────────────────
 //  LAYER 2 — OUTPUT ADVICE VIOLATION DETECTION
-//  Mendeteksi bahasa saran investasi di jawaban AI.
+//  Mendeteksi bahasa saran investasi di jawaban AI. Hanya untuk
+//  monitoring (log): jawaban di-stream, jadi teksnya sudah sampai
+//  ke user saat pemeriksaan berjalan. Pencegahan utamanya adalah
+//  aturan no. 2 di system prompt.
 // ─────────────────────────────────────────────────────────────
 
 const ADVICE_PATTERNS: RegExp[] = [
@@ -93,30 +102,6 @@ export function findAdviceViolations(text: string): string[] {
     if (m) hits.push(m[0]);
   }
   return hits;
-}
-
-// ─────────────────────────────────────────────────────────────
-//  LAYER 3 — OUTPUT SANITIZATION
-//  Mengganti kalimat yang mengandung saran investasi dengan
-//  disclaimer, bukan cuma log.
-// ─────────────────────────────────────────────────────────────
-
-/**
- * Sanitasi output: mengganti kalimat yang mengandung saran investasi
- * dengan peringatan disclaimer.
- */
-export function sanitizeOutput(text: string): { text: string; wasModified: boolean } {
-  let modified = false;
-
-  for (const re of ADVICE_PATTERNS) {
-    if (re.test(text)) {
-      // Ganti kalimat yang mengandung pola saran (baris yang cocok)
-      text = text.replace(re, `[${DISCLAIMER}]`);
-      modified = true;
-    }
-  }
-
-  return { text, wasModified: modified };
 }
 
 // ─────────────────────────────────────────────────────────────

@@ -2,7 +2,7 @@ import { streamText, convertToModelMessages, stepCountIs, type UIMessage, type L
 import { tools } from "./tools";
 import { buildSystemPrompt } from "./prompts";
 import { extractSessionCompanies } from "./session";
-import { detectInjection, findAdviceViolations, sanitizeOutput, INJECTION_RESPONSE } from "./guardrail";
+import { detectInjection, findAdviceViolations, INJECTION_RESPONSE } from "./guardrail";
 import { creditsSpent } from "../integrations/sectors/client";
 
 export type AgentResult =
@@ -57,22 +57,14 @@ export async function runAgent(opts: {
     tools,
     abortSignal: opts.abortSignal,
     maxOutputTokens: opts.level === "detail" ? 2048 : 1024, // Beda limit sesuai mode
-    temperature: 0, // Jawaban lebih cepat dan deterministik
+    temperature: 0, // Jawaban lebih konsisten
     maxRetries: 2,
     stopWhen: stepCountIs(6), // Maksimal 6 langkah alat sebelum menjawab
     onFinish: (event) => {
-      // ── LAYER 3: Output Guardrail ────────────────────
-      const rawText = event.text ?? "";
-
-      // Cek saran investasi
-      const violations = findAdviceViolations(rawText);
-      if (violations.length) {
-        console.warn("[guardrail] 🛑 Terdeteksi bahasa saran investasi:", violations);
-        const sanitized = sanitizeOutput(rawText);
-        if (sanitized.wasModified) {
-          console.warn("[guardrail] Output telah disanitasi");
-        }
-      }
+      // ── LAYER 3: Output Guardrail (monitoring) ───────
+      // Teks sudah ter-stream ke user, jadi di sini hanya dicatat untuk evaluasi prompt.
+      const violations = findAdviceViolations(event.text ?? "");
+      if (violations.length) console.warn("[guardrail] 🛑 Terdeteksi bahasa saran investasi:", violations);
 
       console.log(`[credits] total terpakai sejak server nyala: ${creditsSpent()}`);
     },

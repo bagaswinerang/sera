@@ -12,10 +12,7 @@ export async function cacheGet<T>(key: string): Promise<T | null> {
   if (m) return m.payload as T;
   try {
     const db = getSupabaseClient();
-    if (!db) {
-      console.log("[cache] Supabase client null — hanya memori.");
-      return null;
-    }
+    if (!db) return null; // tanpa Supabase: hanya memori (sudah diperingatkan sekali saat start)
     const { data, error } = await db
       .from("api_cache")
       .select("payload, expires_at")
@@ -40,18 +37,11 @@ export async function cacheSet(key: string, payload: unknown, ttlSeconds: number
   mem.set(key, { payload }, { ttl: ttlSeconds * 1000 });
   try {
     const db = getSupabaseClient();
-    if (!db) {
-      console.log("[cache] Supabase client null — cache hanya di memori.");
-      return;
-    }
+    if (!db) return;
     const { error: upsertError } = await db
       .from("api_cache")
       .upsert({ key, payload, expires_at: new Date(Date.now() + ttlSeconds * 1000).toISOString() });
-    if (upsertError) {
-      console.warn("[cache] cacheSet upsert gagal:", upsertError.message, upsertError.code);
-    } else {
-      console.log(`[cache] ✓ cached ke Supabase: ${key.slice(0, 60)}…`);
-    }
+    if (upsertError) console.warn("[cache] cacheSet upsert gagal:", upsertError.message, upsertError.code);
   } catch (e) {
     console.warn("[cache] cacheSet exception:", e);
   }

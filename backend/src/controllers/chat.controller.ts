@@ -1,8 +1,15 @@
 import type { RequestHandler } from "express";
 import { z } from "zod";
-import { toUIMessageStream, pipeUIMessageStreamToResponse, type LanguageModel, type UIMessage } from "ai";
+import {
+  createUIMessageStream,
+  pipeUIMessageStreamToResponse,
+  toUIMessageStream,
+  type LanguageModel,
+  type UIMessage,
+} from "ai";
 import { runAgent } from "../agent/agent";
 import { tools } from "../agent/tools";
+import { prepareHistory } from "../agent/history";
 
 /**
  * Mengklasifikasikan error teknis menjadi pesan ramah untuk pengguna.
@@ -70,44 +77,26 @@ export function chatController(deps: ChatDeps): RequestHandler {
     });
 
     try {
-      // Ambil 10 pesan terakhir, tapi bersihkan dari tool-invocation yang menggantung (gagal/belum selesai)
-      // Gemini 400 error jika ada function call tanpa function response di riwayat
-      const rawMessages = (messages as unknown as UIMessage[]).slice(-10);
-      const safeMessages = rawMessages
-        .map((m) => {
-          if (m.role === "assistant" && Array.isArray(m.parts)) {
-            // Hanya pertahankan teks atau tool-invocation yang sudah punya hasil (selesai)
-            m.parts = m.parts.filter(
-              (p) =>
-                p.type === "text" ||
-                (p.type === "tool-invocation" && "result" in p && p.result !== undefined)
-            );
-          }
-          return m;
-        })
-        .filter(
-          (m) =>
-            m.role === "user" ||
-            (m.role === "assistant" &&
-              ((Array.isArray(m.parts) && m.parts.length > 0) ||
-                (typeof (m as any).content === "string" && (m as any).content.trim() !== "")))
-        );
-
       const result = await runAgent({
         model,
-        messages: safeMessages,
+        messages: prepareHistory(messages as unknown as UIMessage[]),
         level,
         abortSignal: abort.signal,
       });
 
-      // ── Jika input terdeteksi sebagai prompt injection ──
+      // Input diblokir guardrail: kirim penolakan ramah sebagai stream biasa supaya frontend merendernya normal.
       if (result.type === "blocked") {
-        console.warn(`[guardrail] Input diblokir: ${result.reason}`);
-        // Kirim respons ramah sebagai stream SSE agar frontend tetap bisa render normal
-        res.setHeader("X-Vercel-AI-Data-Stream", "v1");
-        // Format AI SDK data stream: text part
-        res.write(`0:${JSON.stringify(result.response)}\n`);
-        res.end();
+        pipeUIMessageStreamToResponse({
+          response: res,
+          stream: createUIMessageStream({
+            execute: ({ writer }) => {
+              const id = "blocked";
+              writer.write({ type: "text-start", id });
+              writer.write({ type: "text-delta", id, delta: result.response });
+              writer.write({ type: "text-end", id });
+            },
+          }),
+        });
         return;
       }
 
