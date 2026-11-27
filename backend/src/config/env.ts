@@ -14,7 +14,7 @@ export const env = {
     const raw =
       process.env.GEMINI_MODELS ??
       process.env.GEMINI_MODEL ??
-      "gemini-4-hydrogen,gemini-3.8-flash";
+      "gemini-4-hydrogen,gemini-3.8-flash,gemini-3.5-flash-lite";
     return raw
       .split(",")
       .map((s) => s.trim())
